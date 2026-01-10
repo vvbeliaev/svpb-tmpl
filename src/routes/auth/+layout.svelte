@@ -5,7 +5,7 @@
 
 	$effect(() => {
 		const user = userStore.user;
-		if (user && user.email) {
+		if (user && user.verified) {
 			goto('/', { replaceState: true });
 		}
 	});

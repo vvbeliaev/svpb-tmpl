@@ -7,15 +7,13 @@ pb.authStore.onChange((token: string, record: AuthRecord) => {
 	if (record && pb!.authStore.isValid) {
 		try {
 			const user = record as UsersResponse;
-			userStore.user = user;
-			userStore.token = token;
+			userStore.set({ record: user, token });
 
 			setPBCookie();
 		} catch (error) {
 			console.error('Failed to parse user data:', error);
 		}
 	} else {
-		userStore.user = null;
-		userStore.token = null;
+		userStore.clear();
 	}
 }, false);

@@ -47,8 +47,8 @@
 
 	// Global user load
 	$effect(() => {
-		globalPromise.then(({ user, slots, bookings }) => {
-			if (user) userStore.set(user);
+		globalPromise.then(({ userAuth }) => {
+			if (userAuth) userStore.set(userAuth);
 		});
 	});
 
@@ -108,7 +108,7 @@
 {#snippet sidebarFooter({ expanded }: { expanded: boolean })}
 	<!-- <div class="divider my-1"></div> -->
 
-	{#if user}
+	{#if user && user.verified}
 		<div class="mb-1 flex justify-center px-2">
 			<!-- <button
 				class={['btn justify-start btn-ghost', expanded ? 'btn-block' : 'btn-square']}
@@ -129,7 +129,7 @@
 	</div>
 
 	<div class="border-t border-base-300">
-		{#if user && user.email}
+		{#if user && user.verified}
 			<a
 				href="/profile"
 				class={[
@@ -216,7 +216,7 @@
 				</a>
 			{/each}
 
-			{#if user}
+			{#if user && user.verified}
 				<a href="/profile" class:dock-active={page.url.pathname === '/profile'}>
 					<Settings class="size-5" />
 					<span class="dock-label">Profile</span>

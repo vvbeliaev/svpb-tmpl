@@ -1,4 +1,4 @@
-import type { AuthRecord } from 'pocketbase';
+import type { AuthRecord, RecordAuthResponse } from 'pocketbase';
 
 import { Collections, pb, type UsersResponse } from '$lib';
 
@@ -10,14 +10,15 @@ class UserStore {
 
 	avatarUrl = $derived(this.user?.avatar ? pb?.files.getURL(this.user, this.user.avatar) : null);
 
-	set(user: UsersResponse) {
-		this.user = user;
+	set(res: RecordAuthResponse<UsersResponse>) {
+		this.user = res.record;
+		this.token = res.token;
 	}
 
 	async load() {
 		const res = await pb.collection(Collections.Users).authRefresh();
 		this.userId = res.record.id;
-		return res.record as UsersResponse;
+		return res;
 	}
 
 	async subscribe() {
