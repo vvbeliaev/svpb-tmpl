@@ -46,6 +46,9 @@ class UserStore {
 		this.userId = null;
 		this.user = null;
 		this.token = null;
+
+		localStorage.removeItem('guest_id');
+		localStorage.removeItem('guest_password');
 	}
 }
 

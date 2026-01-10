@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
-	import { pb } from '$lib';
+
+	import { Collections, pb } from '$lib';
+	import { userStore } from '$lib/apps/user';
 
 	interface Props {
 		error?: any | null;
@@ -22,6 +24,10 @@
 		}
 	];
 
+	const user = $derived(userStore.user ?? null);
+	const name = $derived(user?.name ?? null);
+	const avatarUrl = $derived(userStore.avatarUrl ?? null);
+
 	const onClick = async (e: MouseEvent) => {
 		if (loading) return;
 
@@ -32,7 +38,7 @@
 			const target = e.currentTarget as HTMLElement;
 			const provider = target.dataset.provider!;
 
-			await pb.collection('users').authWithOAuth2({
+			const authRes = await pb.collection(Collections.Users).authWithOAuth2({
 				provider,
 				query: { expand: '', requestKey: 'oauth2' },
 				createData: {
@@ -41,6 +47,29 @@
 					}
 				}
 			});
+
+			if (!name || !avatarUrl) {
+				const form = new FormData();
+
+				if (!name) {
+					form.append('name', authRes.meta?.name ?? '');
+				}
+
+				if (!avatarUrl) {
+					const avatarUrl = authRes.meta?.avatarUrl;
+					if (avatarUrl) {
+						try {
+							const res = await fetch(avatarUrl);
+							const blob = await res.blob();
+							form.append('avatar', blob, 'avatar.jpg');
+						} catch (err) {
+							console.warn('Failed to fetch avatar from', avatarUrl, err);
+						}
+					}
+				}
+
+				await pb.collection(Collections.Users).update(authRes.record.id, form);
+			}
 
 			await goto('/');
 			await invalidate('app:global');

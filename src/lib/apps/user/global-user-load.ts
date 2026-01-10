@@ -31,9 +31,7 @@ async function authGuest() {
 	if (!guestId || !randomPassword) {
 		guestId = nanoid();
 		randomPassword = nanoid();
-		const email = `${guestId}@guest.com`;
 		await pb.collection(Collections.Users).create({
-			email,
 			guest: guestId,
 			password: randomPassword,
 			passwordConfirm: randomPassword

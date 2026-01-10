@@ -11,7 +11,7 @@
 	const user = $derived(userStore.user);
 
 	function logout() {
-		pb!.authStore.clear();
+		pb.authStore.clear();
 		goto('/auth');
 	}
 </script>
