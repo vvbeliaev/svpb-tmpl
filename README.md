@@ -131,5 +131,5 @@ Experience the power of the **Single Binary Architecture**:
 
 ## 📜 License
 
-MIT © [Cogisoft](https://cogisoft.dev).
+MIT © [Vladimir Beliaev](https://vvbeliaev.cogisoft.dev) from [Cogito Software](https://cogisoft.dev).
 Free to use for personal and commercial projects.
