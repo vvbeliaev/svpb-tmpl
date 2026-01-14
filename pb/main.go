@@ -16,8 +16,6 @@ import (
 func main() {
 	godotenv.Load("../.env")
 
-    
-
 	app := pocketbase.New()
 
     app.OnServe().BindFunc(func(se *core.ServeEvent) error {
@@ -47,8 +45,8 @@ func main() {
             }
 
             // 2. SPA Fallback (index.html)
-            // Ignore API and admin (_/)
-            if !strings.HasPrefix(path, "api/") && !strings.HasPrefix(path, "_/") {
+            // Ignore API, admin (_/) and files with extensions
+            if !strings.HasPrefix(path, "api/") && !strings.HasPrefix(path, "_/") && !strings.Contains(path, ".") {
                 return e.FileFS(fsys, "index.html")
             }
 
@@ -74,4 +72,3 @@ func main() {
         log.Fatal(err)
     }
 }
-
