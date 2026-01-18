@@ -1,8 +1,6 @@
 import { Collections, nanoid, pb } from '$lib';
 
 export async function globalUserLoad() {
-	console.log('globalUserLoad', pb.authStore.isValid);
-
 	if (!pb.authStore.isValid) {
 		try {
 			const userAuth = await authGuest();

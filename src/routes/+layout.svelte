@@ -1,6 +1,15 @@
 <script lang="ts">
 	import posthog from 'posthog-js';
-	import { House, Search, CalendarDays, Settings, LogIn, PanelRight, Menu } from 'lucide-svelte';
+	import {
+		House,
+		Search,
+		CalendarDays,
+		Settings,
+		LogIn,
+		PanelRight,
+		Menu,
+		Github
+	} from 'lucide-svelte';
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 
@@ -125,10 +134,22 @@
 		</div>
 	{/if}
 
-	<div class={['mb-1 border-base-300', expanded ? 'px-2' : 'flex justify-center']}>
+	<div class={['mb-3 flex flex-col border-base-300', expanded ? 'px-2' : 'items-center gap-3']}>
+		<a
+			href="https://github.com/vvbeliaev/svpb-tmpl"
+			target="_blank"
+			rel="noopener noreferrer"
+			class={['btn btn-ghost', expanded ? 'btn-block justify-start gap-2 px-4' : 'btn-square']}
+			title="View on GitHub"
+		>
+			<Github class={expanded ? 'size-5' : 'size-8'} />
+			{#if expanded}
+				<span>GitHub</span>
+			{/if}
+		</a>
+
 		<ThemeController {expanded} navStyle />
 	</div>
-
 	<div class="border-t border-base-300">
 		{#if user && user.verified}
 			<a
