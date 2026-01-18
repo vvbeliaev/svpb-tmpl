@@ -8,7 +8,8 @@
 		LogIn,
 		PanelRight,
 		Menu,
-		Github
+		Github,
+		BrainCog
 	} from 'lucide-svelte';
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -135,6 +136,19 @@
 	{/if}
 
 	<div class={['mb-3 flex flex-col border-base-300', expanded ? 'px-2' : 'items-center gap-3']}>
+		<a
+			href="https://cogisoft.dev"
+			target="_blank"
+			rel="noopener noreferrer"
+			class={['btn btn-ghost', expanded ? 'btn-block justify-start gap-2 px-4' : 'btn-square']}
+			title="made by cogisoft"
+		>
+			<BrainCog class={expanded ? 'size-5' : 'size-8'} />
+			{#if expanded}
+				<span>made by cogisoft</span>
+			{/if}
+		</a>
+
 		<a
 			href="https://github.com/vvbeliaev/svpb-tmpl"
 			target="_blank"
