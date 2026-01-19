@@ -1,39 +1,49 @@
-# Agent Instructions for svpb-tmpl
+# Agent Instructions for JobHunter (Hexagonal Architecture)
 
-This document provides context and rules for AI agents working on this repository.
+This document provides context and rules for AI agents working on the JobHunter backend.
 
-## Project Tech Stack
+## Architecture Principles
 
-- **Frontend**: Svelte 5 (using Runes: `$state`, `$derived`, `$effect`), SvelteKit.
-- **Backend**: PocketBase (Go version) with custom extensions in `pb/main.go`.
-- **Styling**: Tailwind CSS 4 + DaisyUI 5.
-- **Database/Auth**: PocketBase.
-- **Types**: Auto-generated via `pocketbase-typegen`.
-- **Analytics/Payments**: PostHog, Stripe.
+### Backend (Hexagonal Architecture)
+1. **Hexagonal Architecture**:
+   - `core/`: Domain models and interfaces (Ports). NO dependencies on external libraries.
+   - `usecases/`: Business logic implementations. Depends on `core` interfaces.
+   - `adapters/in/`: Driving adapters (HTTP handlers, PB hooks, TG listeners).
+   - `adapters/out/`: Driven adapters (implementations of `core` interfaces for external services like LLM).
+2. **Dependency Injection**: All dependencies are wired in `pb/main.go`.
+3. **PocketBase Integration**: Aggregates wrap `*core.Record` to provide business methods.
 
-## Codebase Architecture
+### Frontend (Svelte 5)
+1. **Svelte 5 Runes**: Always use `$state`, `$derived`, `$effect`. No more `export let` or `writable` stores for component state.
+2. **State Management**: Use `.svelte.ts` classes for complex state (e.g., the job feed).
+3. **Styling**: Tailwind CSS 4 + DaisyUI 5. Prefer utility classes over custom CSS.
+4. **PocketBase Client**: Use the shared client in `src/lib/shared/pb.ts`.
+5. **Types**: Use auto-generated types from `pocketbase-typegen`.
 
+## Modules
+
+### Backend
+- **Collector Module** (`pb/pkg/collector`): Responsible for ingesting data from external sources (Telegram).
+- **Job Module** (`pb/pkg/job`): The core domain (Extraction, Offer Generation).
+
+### Frontend
 - `src/lib/shared`: Generic UI components, utils, and PB client.
-- `src/lib/apps`: App-specific logic and stores (e.g., `user` app).
-- `pb/`: Go source code for PocketBase, migrations, and database data.
-- `src/routes`: SvelteKit routes. SPA mode is prioritized (PocketBase serves `index.html` as fallback).
+- `src/lib/apps`: App-specific logic (e.g., `dashboard` for viewing vacancies).
+- `src/routes`: SvelteKit routes.
 
 ## Development Rules
 
-1. **Svelte 5**: Always use Svelte 5 Runes. Avoid legacy Svelte 4 syntax unless strictly necessary.
-2. **PocketBase Types**: When modifying the database schema via migrations or the PB admin UI, remind the user to run `pnpm gen:types`.
-3. **Go Extensions**: If business logic requires high performance or secure operations (e.g., payment processing, complex DB transactions), suggest implementing it in `pb/main.go` or a sub-package in Go.
-4. **Styling**: Use Tailwind 4 utility classes. Prefer DaisyUI components for common UI elements (buttons, modals, cards).
-5. **State Management**: Use Svelte 5 classes for stores (see `src/lib/apps/user/user.svelte.ts`) instead of traditional Svelte stores (`writable`, `readable`).
-
-## Key Files to Watch
-
-- `pb/main.go`: Entry point for backend logic.
-- `src/lib/shared/pb/pb.ts`: PocketBase client initialization.
-- `src/lib/apps/user/user.svelte.ts`: Global user state.
+1. **Go Context**: Always pass `context.Context` through services and adapters.
+2. **LLM Prompts**: Keep prompts inside `adapters/out/` of the respective module.
+3. **State Machine**: Only the `Job` aggregate should change its own status. Use methods like `job.Complete(data)`.
+4. **Error Handling**: Use structured logging with `zap`.
+5. **Config**: Use `pb/config/config.go` for all environment-based settings.
 
 ## Common Tasks
 
-- **Adding a new collection**: Create a migration in `pb/migrations/` (or use admin UI), then run `pnpm gen:types`.
-- **New UI Component**: Place in `src/lib/shared/ui/` if generic, or `src/lib/apps/[app]/ui/` if specific.
-- **Environment Variables**: Managed via `.env` at the root. Dynamic public envs used in SvelteKit.
+- **New Source**: Add a new folder in `pkg/collector/adapters/in` (e.g., `discord.go`).
+- **New LLM Model**: Update the `Extractor` or `OfferGenerator` in `pkg/job/adapters/out`.
+- **New Job Field**: 
+  1. Add to `ParsedData` in `pkg/job/core/ports.go`.
+  2. Update `job.Complete()` in `pkg/job/core/job.go`.
+  3. Update prompt/mapping in `pkg/job/adapters/out/extractor.go`.
