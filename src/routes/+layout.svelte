@@ -141,11 +141,11 @@
 			target="_blank"
 			rel="noopener noreferrer"
 			class={['btn btn-ghost', expanded ? 'btn-block justify-start gap-2 px-4' : 'btn-square']}
-			title="made by cogisoft"
+			title="Made by Cogisoft"
 		>
 			<BrainCog class={expanded ? 'size-5' : 'size-8'} />
 			{#if expanded}
-				<span>made by cogisoft</span>
+				<span class="text-nowrap">Made by Cogisoft</span>
 			{/if}
 		</a>
 
